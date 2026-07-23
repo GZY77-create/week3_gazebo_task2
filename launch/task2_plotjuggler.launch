@@ -1,0 +1,9 @@
+<launch>
+  <arg name="datafile" default="$(find week3_gazebo_task2)/data/task2_final.bag"/>
+  <node pkg="plotjuggler" type="plotjuggler" name="task2_plotjuggler"
+        output="screen"
+        args="-n -d $(arg datafile) --window_title 'Week 3 Task 2 - Flight Data'">
+    <!-- The ROS bag loader links against libraries in /opt/ros/noetic/lib. -->
+    <env name="LD_LIBRARY_PATH" value="/opt/ros/noetic/lib"/>
+  </node>
+</launch>

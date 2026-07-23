@@ -1,0 +1,26 @@
+<launch>
+  <arg name="start_mavros" default="true"/>
+  <arg name="fcu_url" default="udp://:14540@127.0.0.1:14580"/>
+  <arg name="cruise_height" default="2.5"/>
+  <arg name="use_gazebo_waypoints" default="true"/>
+
+  <include if="$(arg start_mavros)"
+           file="$(find week3_gazebo_task2)/launch/task2_mavros.launch">
+    <arg name="fcu_url" value="$(arg fcu_url)"/>
+  </include>
+
+  <node pkg="week3_gazebo_task2" type="task2_mission.py"
+        name="task2_mission" output="screen" required="true">
+    <param name="rate" value="20.0"/>
+    <param name="cruise_height" value="$(arg cruise_height)"/>
+    <param name="use_gazebo_waypoints" value="$(arg use_gazebo_waypoints)"/>
+    <param name="gazebo_world" value="task2_landmarks"/>
+    <param name="spawn_offset_x" value="1.01"/>
+    <param name="spawn_offset_y" value="0.98"/>
+    <param name="minimum_height" value="1.0"/>
+    <param name="position_tolerance" value="0.35"/>
+    <param name="speed_tolerance" value="0.30"/>
+    <param name="waypoint_timeout" value="35.0"/>
+    <param name="hold_seconds" value="0.5"/>
+  </node>
+</launch>

@@ -1,0 +1,4 @@
+scripts/__pycache__/
+*.py[cod]
+*.bag.active
+*.orig

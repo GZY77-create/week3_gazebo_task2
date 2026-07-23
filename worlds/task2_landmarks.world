@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="task2_landmarks">
+    <gravity>0 0 -9.8066</gravity>
+    <magnetic_field>0.21523 0 0.42741</magnetic_field>
+    <atmosphere type="adiabatic"/>
+
+    <physics name="default_physics" default="0" type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+
+    <scene>
+      <ambient>0.45 0.45 0.45 1</ambient>
+      <background>0.75 0.85 1 1</background>
+      <shadows>true</shadows>
+      <grid>true</grid>
+    </scene>
+
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>47.397742</latitude_deg>
+      <longitude_deg>8.545594</longitude_deg>
+      <elevation>488</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Landmark 1: a tall red cylinder that the route must avoid. -->
+    <model name="red_cylinder_obstacle">
+      <static>true</static>
+      <pose>6.01 0.98 2 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><cylinder><radius>0.75</radius><length>4</length></cylinder></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.75</radius><length>4</length></cylinder></geometry>
+          <material>
+            <ambient>0.8 0.02 0.02 1</ambient>
+            <diffuse>1 0.03 0.03 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Draggable visual waypoint 1 (cyan), local coordinate (2,-2). -->
+    <model name="waypoint_1_cyan">
+      <static>true</static>
+      <pose>3.01 3.26358 0.10 0 0 0</pose>
+      <link name="link">
+        <visual name="disk">
+          <geometry><cylinder><radius>0.45</radius><length>0.12</length></cylinder></geometry>
+          <material><ambient>0 0.75 0.85 1</ambient><diffuse>0 0.95 1 1</diffuse></material>
+        </visual>
+        <visual name="beacon">
+          <pose>0 0 0.45 0 0 0</pose>
+          <geometry><sphere><radius>0.20</radius></sphere></geometry>
+          <material><ambient>0 0.75 0.85 1</ambient><diffuse>0 0.95 1 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Draggable visual waypoint 2 (magenta), local coordinate (8,-2). -->
+    <model name="waypoint_2_magenta">
+      <static>true</static>
+      <pose>9.01 -1.02 0.10 0 0 0</pose>
+      <link name="link">
+        <visual name="disk">
+          <geometry><cylinder><radius>0.45</radius><length>0.12</length></cylinder></geometry>
+          <material><ambient>0.75 0.05 0.75 1</ambient><diffuse>1 0.05 1 1</diffuse></material>
+        </visual>
+        <visual name="beacon">
+          <pose>0 0 0.45 0 0 0</pose>
+          <geometry><sphere><radius>0.20</radius></sphere></geometry>
+          <material><ambient>0.75 0.05 0.75 1</ambient><diffuse>1 0.05 1 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Landmark 2 and draggable final waypoint: green target disk. -->
+    <model name="green_target_point">
+      <static>true</static>
+      <pose>9.01 5.98 0.04 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><cylinder><radius>1.0</radius><length>0.08</length></cylinder></geometry>
+        </collision>
+        <visual name="outer_ring">
+          <geometry><cylinder><radius>1.0</radius><length>0.08</length></cylinder></geometry>
+          <material>
+            <ambient>0.02 0.65 0.05 1</ambient>
+            <diffuse>0.03 0.95 0.08 1</diffuse>
+          </material>
+        </visual>
+        <visual name="center">
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry><cylinder><radius>0.32</radius><length>0.03</length></cylinder></geometry>
+          <material>
+            <ambient>0.9 0.9 0.9 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Landmark 3: a clearly marked yellow no-fly area. -->
+    <model name="yellow_no_fly_zone">
+      <static>true</static>
+      <pose>3.01 5.98 0.025 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>3 3 0.05</size></box></geometry>
+        </collision>
+        <visual name="zone">
+          <geometry><box><size>3 3 0.05</size></box></geometry>
+          <material>
+            <ambient>0.85 0.65 0.02 1</ambient>
+            <diffuse>1 0.8 0.02 1</diffuse>
+          </material>
+        </visual>
+        <visual name="stripe_x">
+          <pose>0 0 0.04 0 0 0.785398</pose>
+          <geometry><box><size>3.8 0.18 0.04</size></box></geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+        </visual>
+        <visual name="stripe_y">
+          <pose>0 0 0.04 0 0 -0.785398</pose>
+          <geometry><box><size>3.8 0.18 0.04</size></box></geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Blue start/landing pad at the local-frame origin. -->
+    <model name="blue_start_pad">
+      <static>true</static>
+      <pose>1.01 0.98 0.025 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>2 2 0.05</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>2 2 0.05</size></box></geometry>
+          <material><ambient>0.02 0.2 0.8 1</ambient><diffuse>0.03 0.3 1 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <gui fullscreen="0">
+      <camera name="task2_overview">
+        <pose>14 -16 13 0 0.48 2.35</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>
