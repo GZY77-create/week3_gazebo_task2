@@ -53,30 +53,13 @@ sudo /opt/ros/noetic/lib/mavros/install_geographiclib_datasets.sh
 
 ```text
 week3_gazebo_task2/
-├── CMakeLists.txt
-├── package.xml
-├── worlds/task2_landmarks.world
-├── launch/
-│   ├── task2_mavros.launch
-│   ├── task2_mission.launch
-│   ├── task2_plotjuggler.launch
-│   └── task2_record.launch
-├── scripts/
-│   ├── start_task2_sim.sh
-│   ├── start_task2_all.sh
-│   ├── start_task2_host.sh
-│   ├── task2_mission.py
-│   ├── task2_logger.py
-│   └── plot_flight.py
-├── data/
-│   ├── task2_final.csv
-│   └── task2_final.bag
-├── images/
-│   ├── task2_gazebo_overview.jpg
-│   ├── task2_complete.jpg
-│   └── task2_plotjuggler_position.png
-├── plots/task2_final_analysis.png
-└── videos/task2_demo.mp4
+├── launch/    # ROS 启动文件
+├── scripts/   # 飞行、记录和绘图脚本
+├── worlds/    # Gazebo 场景
+├── data/      # CSV 与 rosbag 飞行记录
+├── images/    # 验收截图
+├── plots/     # 轨迹分析图
+└── videos/    # 验收录屏
 ```
 
 ## 4. 编译与环境加载
