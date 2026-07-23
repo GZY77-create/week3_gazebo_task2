@@ -14,12 +14,16 @@ catkin_install_python(PROGRAMS
   scripts/task2_mission.py
   scripts/task2_logger.py
   scripts/plot_flight.py
+  scripts/check_submission.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(PROGRAMS
   scripts/start_task2_sim.sh
   scripts/start_task2_all.sh
+  scripts/start_task2_host.sh
+  scripts/start_task2_docker.sh
+  scripts/check_submission.sh
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

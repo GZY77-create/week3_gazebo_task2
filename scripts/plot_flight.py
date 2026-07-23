@@ -19,9 +19,9 @@ PLANNED_XY = np.array([
     [-0.5, 2.5], [0.0, 0.0],
 ])
 WAYPOINT_LABELS = [
-    "Start", "Cyan", "Cylinder entry", "Cylinder exit", "Magenta",
+    "Start / End", "Cyan", "Cylinder entry", "Cylinder exit", "Magenta",
     "Target", "No-fly upper right", "No-fly upper left",
-    "No-fly lower left", "Return",
+    "No-fly lower left", "",
 ]
 
 
@@ -46,6 +46,25 @@ def point_segment_distance(px, py, a, b):
     t = min(1.0, max(0.0, t))
     closest = a + t * ab
     return math.hypot(px - closest[0], py - closest[1])
+
+
+def closest_route_point(px, py):
+    best_distance = float("inf")
+    best_point = None
+    for index in range(len(PLANNED_XY) - 1):
+        start, end = PLANNED_XY[index], PLANNED_XY[index + 1]
+        delta = end - start
+        denominator = float(np.dot(delta, delta))
+        if denominator == 0:
+            candidate = start
+        else:
+            fraction = float(np.dot(np.array([px, py]) - start, delta) / denominator)
+            candidate = start + min(1.0, max(0.0, fraction)) * delta
+        distance = math.hypot(px - candidate[0], py - candidate[1])
+        if distance < best_distance:
+            best_distance = distance
+            best_point = candidate
+    return best_point
 
 
 def tracking_error(x, y):
@@ -87,6 +106,7 @@ def main():
     max_local = int(np.argmax(errors))
     max_index = int(active_indices[max_local])
     max_error = float(errors[max_local])
+    max_route_point = closest_route_point(x[max_index], y[max_index])
 
     os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
     plt.rcParams.update({
@@ -122,24 +142,40 @@ def main():
                     facecolors="white", edgecolors="#111827", linewidths=1.5,
                     zorder=5, label="Mission waypoints")
     for label, point in zip(WAYPOINT_LABELS, unique_waypoints):
-        ax_path.annotate(label, point, xytext=(5, 7), textcoords="offset points",
-                         fontsize=8, color="#111827")
+        if label:
+            ax_path.annotate(label, point, xytext=(5, 7), textcoords="offset points",
+                             fontsize=8, color="#111827")
+    ax_path.scatter([x[active_indices[0]]], [y[active_indices[0]]],
+                    color="#16a34a", marker="o", s=80, zorder=6,
+                    label="Recorded start")
+    ax_path.scatter([x[-1]], [y[-1]], color="#7c3aed", marker="*", s=130,
+                    zorder=6, label="Recorded end")
     ax_path.scatter([x[max_index]], [y[max_index]], color="#dc2626", marker="x",
                     s=75, linewidths=2.0, zorder=6)
+    ax_path.plot([x[max_index], max_route_point[0]],
+                 [y[max_index], max_route_point[1]],
+                 color="#dc2626", linestyle=":", linewidth=1.6)
     ax_path.annotate("Max cross-track error\n{:.2f} m".format(max_error),
                      (x[max_index], y[max_index]), xytext=(28, -35),
                      textcoords="offset points",
                      arrowprops={"arrowstyle": "->", "color": "#dc2626"},
                      color="#991b1b", fontsize=9,
                      bbox={"boxstyle": "round,pad=0.25", "fc": "white", "ec": "#fecaca"})
-    ax_path.set_title("Task 2 XY flight trajectory")
+    ax_path.set_title("Task 2 XY flight trajectory", pad=28)
     ax_path.text(0.0, 1.01, "ENU local frame (m); airborne samples only",
                  transform=ax_path.transAxes, fontsize=9, color="#6b7280")
     ax_path.set_xlabel("East x (m)")
     ax_path.set_ylabel("North y (m)")
     ax_path.set_aspect("equal", adjustable="box")
     ax_path.grid(True, color="#e5e7eb", linewidth=0.8)
-    ax_path.legend(loc="upper left", frameon=True, framealpha=0.95, fontsize=8)
+    ax_path.legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.10),
+        ncol=4,
+        frameon=True,
+        framealpha=0.95,
+        fontsize=7,
+    )
 
     ax_alt.plot(time, z, color="#2563eb", linewidth=1.5)
     ax_alt.axhline(1.0, color="#f59e0b", linestyle="--", linewidth=1.3,
@@ -163,13 +199,7 @@ def main():
 
     fig.suptitle("Week 3 Task 2 — Flight data verification", x=0.06, y=0.985,
                  ha="left", fontsize=15, fontweight="bold", color="#111827")
-    fig.text(0.06, 0.02,
-             "Source: {} | {} samples | {:.1f} s | max cross-track error {:.2f} m"
-             .format(
-                 os.path.basename(args.input), len(time),
-                 float(time[-1] - time[0]), max_error
-             ),
-             fontsize=9, color="#4b5563")
+    fig.subplots_adjust(bottom=0.16)
     fig.savefig(args.output, dpi=180, bbox_inches="tight", facecolor="white")
     print("saved:", os.path.abspath(args.output))
     print("samples:", len(time))

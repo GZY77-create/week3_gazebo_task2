@@ -1,0 +1,9 @@
+.git
+build
+devel
+data/*.bag
+data/*.bag.active
+data/*.csv
+videos
+__pycache__
+*.pyc

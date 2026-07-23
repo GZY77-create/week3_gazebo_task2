@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  task2:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        PX4_TAG: v1.14.0
+    image: week3-gazebo-task2:latest
+    container_name: task2-ros-noetic
+    network_mode: host
+    ipc: host
+    environment:
+      DISPLAY: ${DISPLAY}
+      QT_X11_NO_MITSHM: "1"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - .:/root/catkin_ws/src/week3_gazebo_task2:rw
+    stdin_open: true
+    tty: true
+    command: ["bash", "-lc", "cd /root/catkin_ws && catkin_make --pkg week3_gazebo_task2 && tail -f /dev/null"]

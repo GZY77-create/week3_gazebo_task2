@@ -14,6 +14,15 @@
 
 ![Gazebo 自定义场景](images/task2_gazebo_overview.jpg)
 
+主要目录：
+
+```text
+launch/   ROS 启动文件        scripts/  飞行、记录、绘图和验收脚本
+worlds/   Gazebo 场景         data/     最终 CSV 与 rosbag
+docker/   Docker 构建文件     images/   验收截图
+plots/    轨迹分析图          videos/   验收录屏
+```
+
 ## 复现环境
 
 已验证的软件组合：
@@ -143,43 +152,27 @@ rostopic echo /mavros/local_position/pose
 
 降落后先在终端 3 按 `Ctrl+C`，等待 rosbag 正常建立索引；再关闭任务和 MAVROS，最后在 PX4 控制台输入 `shutdown`。
 
-## Docker 一键复现（可选）
+## Docker 从零复现
 
-此方式适用于已有 ROS Noetic 容器，并且容器内已安装 PX4 v1.14、Gazebo、MAVROS 和本项目依赖的电脑。容器需要：
+仓库提供 `docker/Dockerfile` 和 `docker-compose.yml`，会自动安装 ROS Noetic、PX4 v1.14、Gazebo、MAVROS、PlotJuggler 和 Python 依赖，不需要提前准备自定义镜像。
 
-- 名称为 `ros-noetic`，或通过 `TASK2_CONTAINER` 指定
-- 宿主机工作空间挂载到容器 `/root/catkin_ws`
-- 使用 host 网络
-- 挂载 `/tmp/.X11-unix` 并传入 `DISPLAY`
-
-首次创建容器时可参考：
+宿主机只需安装 Docker、Compose 插件和 GNOME Terminal。克隆仓库后执行：
 
 ```bash
-cd ~/ros-noetic-workspace
-xhost +si:localuser:root
-docker run -it --name ros-noetic \
-  --network host --ipc host \
-  -e DISPLAY="$DISPLAY" -e QT_X11_NO_MITSHM=1 \
-  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-  -v "$PWD":/root/catkin_ws:rw \
-  <已安装ROS与PX4的镜像> bash
+git clone https://github.com/GZY77-create/week3_gazebo_task2.git
+cd week3_gazebo_task2
+./scripts/start_task2_docker.sh
 ```
 
-仓库不提供大型 Docker 镜像，因此 `<已安装ROS与PX4的镜像>` 需要替换为本机镜像名。
+脚本自动兼容 `docker compose` 和 `docker-compose`，完成镜像构建、容器启动、X11 授权和四终端启动。首次构建需要下载 PX4 及依赖，耗时取决于网络；以后再次运行同一命令会复用构建缓存。
 
-容器已存在时，在宿主机执行：
+对应的手动命令为：
 
 ```bash
-docker start ros-noetic
 xhost +si:localuser:root
-cd ~/ros-noetic-workspace/src/week3_gazebo_task2
-./scripts/start_task2_host.sh
-```
-
-容器名不是 `ros-noetic` 时：
-
-```bash
-TASK2_CONTAINER=实际容器名 ./scripts/start_task2_host.sh
+docker compose build
+docker compose up -d
+TASK2_CONTAINER=task2-ros-noetic ./scripts/start_task2_host.sh
 ```
 
 脚本会在宿主机自动排列四个终端：
@@ -190,6 +183,12 @@ TASK2_CONTAINER=实际容器名 ./scripts/start_task2_host.sh
 4. 飞行控制节点
 
 每次数据保存为 `data/task2_run_时间.csv/.bag`。飞机降落后仍需在第 3 个终端按 `Ctrl+C`。
+
+关闭容器：
+
+```bash
+docker compose down
+```
 
 ## 飞行流程与任务规则
 
@@ -237,6 +236,28 @@ head ~/catkin_ws/src/week3_gazebo_task2/data/task2_final.csv
 ```
 
 最终 rosbag 共 8567 条消息，包含以上四类关键话题；CSV 共 1546 条记录，覆盖 77.22 s。
+
+### 自动验收
+
+在安装 ROS Noetic 的宿主机运行：
+
+```bash
+cd ~/catkin_ws/src/week3_gazebo_task2
+./scripts/check_submission.sh
+```
+
+Docker 环境运行完整检查：
+
+```bash
+docker compose exec task2 bash -lc \
+  '/root/catkin_ws/src/week3_gazebo_task2/scripts/check_submission.sh'
+```
+
+脚本会检查 Shell、Python、XML、证据文件、CSV 字段与样本数、rosbag 索引与话题、禁飞区、圆柱净空、目标误差、航迹误差、返航误差和最终解锁状态。全部通过时输出：
+
+```text
+TASK2_ACCEPTANCE_CHECK: PASS
+```
 
 ## 轨迹和高度变化图
 
@@ -313,8 +334,8 @@ PX4 server already running for instance 0
 **解决：** 确认飞机已经接地且 `armed: False`，正常关闭旧终端；Docker 环境可重启容器后只运行一次启动脚本：
 
 ```bash
-docker restart ros-noetic
-./scripts/start_task2_host.sh
+docker compose restart task2
+TASK2_CONTAINER=task2-ros-noetic ./scripts/start_task2_host.sh
 ```
 
 ### 2. MAVROS 一直显示 `connected: False`
@@ -369,3 +390,5 @@ Gazebo 启动或仿真时间重置时，MAVROS 会重新同步时间。若随后
 - Gazebo 截图：[`images/task2_gazebo_overview.jpg`](images/task2_gazebo_overview.jpg)
 - 完成状态截图：[`images/task2_complete.jpg`](images/task2_complete.jpg)
 - 完整录屏：[`videos/task2_demo.mp4`](videos/task2_demo.mp4)
+
+本项目使用 [MIT License](LICENSE)。
