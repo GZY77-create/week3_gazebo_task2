@@ -18,44 +18,16 @@
 
 ```text
 week3_gazebo_task2/
-├── CMakeLists.txt                         # catkin 构建、Python/Shell 脚本安装规则
-├── package.xml                            # ROS 包信息及运行依赖
-├── LICENSE                                # MIT 开源许可证
-├── README.md                              # 环境安装、运行步骤和结果说明
-├── .gitignore                             # Git 忽略规则
-├── .dockerignore                          # Docker 构建上下文忽略规则
-├── docker-compose.yml                     # 构建并启动 ROS/PX4/Gazebo 容器
-├── docker/
-│   ├── Dockerfile                         # 安装 ROS Noetic、PX4、Gazebo 和 MAVROS
-│   └── entrypoint.sh                      # 容器启动时加载 ROS 与 catkin 环境
-├── launch/
-│   ├── task2_mavros.launch                # 连接 PX4 SITL 的 MAVROS 启动文件
-│   ├── task2_mission.launch               # 启动航点任务节点并配置飞行参数
-│   ├── task2_record.launch                # 启动 CSV 记录器和 rosbag 录制
-│   └── task2_plotjuggler.launch           # 使用 PlotJuggler 打开飞行 rosbag
-├── scripts/
-│   ├── task2_mission.py                   # OFFBOARD 起飞、绕障、返航和降落控制
-│   ├── task2_logger.py                    # 记录位置、速度、姿态和飞控状态到 CSV
-│   ├── plot_flight.py                     # 根据 CSV 绘制轨迹、高度和速度图
-│   ├── check_submission.py                # 计算航迹、障碍净空和落点等指标
-│   ├── check_submission.sh                # 执行代码、证据、CSV 和 rosbag 完整检查
-│   ├── start_task2_sim.sh                 # 启动 PX4 SITL、Iris 和自定义 Gazebo 世界
-│   ├── start_task2_all.sh                 # 在容器内自动打开完整任务所需终端
-│   ├── start_task2_host.sh                # 从宿主机排列并启动容器内四个终端
-│   └── start_task2_docker.sh              # 构建容器并启动 Docker 复现流程
-├── worlds/
-│   └── task2_landmarks.world              # 起降点、圆柱、目标点和禁飞区场景
-├── data/
-│   ├── task2_final.csv                    # 最终飞行状态与轨迹数据
-│   └── task2_final.bag                    # 最终 ROS 话题录制文件
-├── plots/
-│   └── task2_final_analysis.png           # 最终轨迹、高度和速度分析图
-├── images/
-│   ├── task2_gazebo_overview.jpg          # Gazebo 自定义场景截图
-│   ├── task2_complete.jpg                 # 飞行任务完成截图
-│   └── task2_plotjuggler_position.png     # PlotJuggler 位置数据截图
-└── videos/
-    └── task2_demo.mp4                     # 起飞、绕障、返航和降落完整录屏
+├── CMakeLists.txt / package.xml  # catkin 构建与 ROS 依赖
+├── docker-compose.yml            # Docker 一键运行配置
+├── docker/                       # ROS、PX4、Gazebo 容器环境
+├── launch/                       # MAVROS、任务、记录和 PlotJuggler 启动文件
+├── scripts/                      # 飞行控制、数据记录、绘图和启动脚本
+├── worlds/                       # Gazebo 自定义障碍场景
+├── data/                         # 最终 CSV 与 rosbag 数据
+├── plots/                        # 飞行轨迹分析图
+├── images/                       # Gazebo、任务完成和数据截图
+└── videos/                       # 完整飞行录屏
 ```
 
 ## 复现环境
